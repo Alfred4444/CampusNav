@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -6,7 +6,7 @@ import { Building } from "@/types/building";
 import { campusBuildings, getCategoryColor, getCategoryLabel } from "@/data/buildings";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Clock, ArrowRight } from "lucide-react";
+import { Clock, ArrowRight } from "lucide-react";
 
 interface CampusMapProps {
   center: [number, number];
@@ -16,7 +16,7 @@ interface CampusMapProps {
 }
 
 // Component to handle map view changes
-const MapController = ({ center, zoom }: { center: [number, number]; zoom: number }) => {
+function MapController({ center, zoom }: { center: [number, number]; zoom: number }) {
   const map = useMap();
   
   useEffect(() => {
@@ -24,7 +24,7 @@ const MapController = ({ center, zoom }: { center: [number, number]; zoom: numbe
   }, [center, zoom, map]);
   
   return null;
-};
+}
 
 // Create custom marker icon
 const createMarkerIcon = (category: Building["category"], isSelected: boolean) => {
@@ -72,14 +72,11 @@ const getCategoryBadgeClass = (category: Building["category"]) => {
 };
 
 const CampusMap = ({ center, zoom, selectedBuilding, onSelectBuilding }: CampusMapProps) => {
-  const mapRef = useRef<L.Map>(null);
-
   return (
     <MapContainer
       center={center}
       zoom={zoom}
       className="w-full h-full z-0"
-      ref={mapRef}
       zoomControl={false}
     >
       <TileLayer
