@@ -1,29 +1,14 @@
-import { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Building } from "@/types/building";
 import { campusBuildings, getCategoryColor, getCategoryLabel } from "@/data/buildings";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Clock, ArrowRight } from "lucide-react";
 
 interface CampusMapProps {
   center: [number, number];
   zoom: number;
   selectedBuilding: Building | null;
   onSelectBuilding: (building: Building) => void;
-}
-
-// Component to handle map view changes
-function MapController({ center, zoom }: { center: [number, number]; zoom: number }) {
-  const map = useMap();
-  
-  useEffect(() => {
-    map.setView(center, zoom, { animate: true, duration: 0.5 });
-  }, [center, zoom, map]);
-  
-  return null;
 }
 
 // Create custom marker icon
@@ -60,77 +45,100 @@ const createMarkerIcon = (category: Building["category"], isSelected: boolean) =
   });
 };
 
-const getCategoryBadgeClass = (category: Building["category"]) => {
-  const classes: Record<Building["category"], string> = {
-    faculty: "bg-primary text-primary-foreground",
-    department: "bg-secondary text-secondary-foreground",
-    hostel: "bg-category-hostel text-primary-foreground",
-    admin: "bg-category-admin text-primary-foreground",
-    facility: "bg-category-facility text-primary-foreground",
-  };
-  return classes[category];
-};
-
 const CampusMap = ({ center, zoom, selectedBuilding, onSelectBuilding }: CampusMapProps) => {
-  return (
-    <MapContainer
-      center={center}
-      zoom={zoom}
-      className="w-full h-full z-0"
-      zoomControl={false}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      
-      <MapController center={center} zoom={zoom} />
-      
-      {campusBuildings.map((building) => (
-        <Marker
-          key={building.id}
-          position={[building.latitude, building.longitude]}
-          icon={createMarkerIcon(building.category, selectedBuilding?.id === building.id)}
-          eventHandlers={{
-            click: () => onSelectBuilding(building),
-          }}
-        >
-          <Popup className="custom-popup" maxWidth={300}>
-            <div className="p-4 min-w-[250px]">
-              <div className="flex items-start justify-between gap-2 mb-3">
-                <h3 className="font-display font-semibold text-foreground text-lg leading-tight">
-                  {building.name}
-                </h3>
-                <Badge className={`${getCategoryBadgeClass(building.category)} text-xs shrink-0`}>
-                  {getCategoryLabel(building.category)}
-                </Badge>
-              </div>
-              
-              <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                {building.description}
-              </p>
-              
-              {building.openingHours && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                  <Clock className="h-4 w-4" />
-                  <span>{building.openingHours}</span>
-                </div>
-              )}
-              
-              <Button 
-                size="sm" 
-                className="w-full"
-                onClick={() => onSelectBuilding(building)}
-              >
-                View Details
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
+  const mapRef = useRef<L.Map | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const markersRef = useRef<Map<string, L.Marker>>(new Map());
+
+  // Initialize map
+  useEffect(() => {
+    if (!containerRef.current || mapRef.current) return;
+
+    const map = L.map(containerRef.current, {
+      center: center,
+      zoom: zoom,
+      zoomControl: false,
+    });
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map);
+
+    // Add markers for all buildings
+    campusBuildings.forEach((building) => {
+      const marker = L.marker([building.latitude, building.longitude], {
+        icon: createMarkerIcon(building.category, false),
+      }).addTo(map);
+
+      const popupContent = `
+        <div class="p-4 min-w-[250px]">
+          <div class="flex items-start justify-between gap-2 mb-3">
+            <h3 class="font-semibold text-lg leading-tight">
+              ${building.name}
+            </h3>
+            <span class="px-2 py-1 text-xs rounded-full bg-primary text-white shrink-0">
+              ${getCategoryLabel(building.category)}
+            </span>
+          </div>
+          <p class="text-sm text-gray-600 mb-3">
+            ${building.description}
+          </p>
+          ${building.openingHours ? `
+            <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
+              <span>🕐 ${building.openingHours}</span>
             </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
-  );
+          ` : ''}
+          <button 
+            class="w-full px-4 py-2 bg-primary text-white rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
+            onclick="window.selectBuilding('${building.id}')"
+          >
+            View Details →
+          </button>
+        </div>
+      `;
+
+      marker.bindPopup(popupContent, { maxWidth: 300, className: "custom-popup" });
+      marker.on("click", () => onSelectBuilding(building));
+      markersRef.current.set(building.id, marker);
+    });
+
+    // Expose selectBuilding function globally for popup button
+    (window as any).selectBuilding = (buildingId: string) => {
+      const building = campusBuildings.find(b => b.id === buildingId);
+      if (building) {
+        onSelectBuilding(building);
+      }
+    };
+
+    mapRef.current = map;
+
+    return () => {
+      delete (window as any).selectBuilding;
+      map.remove();
+      mapRef.current = null;
+      markersRef.current.clear();
+    };
+  }, []);
+
+  // Update map view when center or zoom changes
+  useEffect(() => {
+    if (mapRef.current) {
+      mapRef.current.setView(center, zoom, { animate: true, duration: 0.5 });
+    }
+  }, [center, zoom]);
+
+  // Update marker icons when selected building changes
+  useEffect(() => {
+    markersRef.current.forEach((marker, buildingId) => {
+      const building = campusBuildings.find(b => b.id === buildingId);
+      if (building) {
+        const isSelected = selectedBuilding?.id === buildingId;
+        marker.setIcon(createMarkerIcon(building.category, isSelected));
+      }
+    });
+  }, [selectedBuilding]);
+
+  return <div ref={containerRef} className="w-full h-full z-0" />;
 };
 
 export default CampusMap;
