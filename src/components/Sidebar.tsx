@@ -23,13 +23,13 @@ const Sidebar = ({
     <aside
       className={`
         fixed lg:relative inset-y-0 left-0 z-40
-        w-80 lg:w-96 bg-card border-r border-border
+        w-[calc(100vw-40px)] max-w-80 sm:w-80 lg:w-96 bg-card border-r border-border
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        pt-16 lg:pt-0
+        pt-14 sm:pt-16 lg:pt-0
       `}
     >
-      <div className="h-full">
+      <div className="h-full overflow-hidden">
         {selectedBuilding ? (
           <BuildingDetail building={selectedBuilding} onClose={onClearSelection} />
         ) : (

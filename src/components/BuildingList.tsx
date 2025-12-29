@@ -44,11 +44,11 @@ const BuildingList = ({
   return (
     <div className="h-full flex flex-col">
       {/* Category Filters */}
-      <div className="p-4 border-b border-border">
-        <p className="text-xs text-muted-foreground mb-2 font-medium">Categories</p>
-        <div className="flex flex-wrap gap-2">
+      <div className="p-2 sm:p-4 border-b border-border">
+        <p className="text-[10px] sm:text-xs text-muted-foreground mb-1.5 sm:mb-2 font-medium">Categories</p>
+        <div className="flex flex-wrap gap-1 sm:gap-2">
           <Badge
-            className={`cursor-pointer transition-all ${
+            className={`cursor-pointer transition-all text-[10px] sm:text-xs px-1.5 sm:px-2.5 py-0.5 ${
               !selectedCategory
                 ? "bg-foreground text-background"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -60,7 +60,7 @@ const BuildingList = ({
           {categories.map((category) => (
             <Badge
               key={category}
-              className={`transition-all ${getCategoryBadgeClass(category, selectedCategory === category)}`}
+              className={`transition-all text-[10px] sm:text-xs px-1.5 sm:px-2.5 py-0.5 ${getCategoryBadgeClass(category, selectedCategory === category)}`}
               onClick={() => onSelectCategory(selectedCategory === category ? null : category)}
             >
               {getCategoryLabel(category)}
@@ -71,9 +71,9 @@ const BuildingList = ({
 
       {/* Building List */}
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-6">
+        <div className="p-2 sm:p-4 space-y-4 sm:space-y-6">
           {selectedCategory ? (
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               {filteredBuildings.map((building) => (
                 <BuildingCard
                   key={building.id}
@@ -90,19 +90,19 @@ const BuildingList = ({
 
               return (
                 <div key={category}>
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
                     <div
-                      className="w-3 h-3 rounded-full"
+                      className="w-2 h-2 sm:w-3 sm:h-3 rounded-full"
                       style={{ backgroundColor: getCategoryColor(category) }}
                     />
-                    <h3 className="font-semibold text-foreground text-sm">
+                    <h3 className="font-semibold text-foreground text-xs sm:text-sm">
                       {getCategoryLabel(category)}
                     </h3>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-[10px] sm:text-xs text-muted-foreground">
                       ({categoryBuildings.length})
                     </span>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5 sm:space-y-2">
                     {categoryBuildings.map((building) => (
                       <BuildingCard
                         key={building.id}
@@ -131,28 +131,28 @@ interface BuildingCardProps {
 const BuildingCard = ({ building, isSelected, onClick }: BuildingCardProps) => {
   return (
     <button
-      className={`w-full p-3 rounded-lg text-left transition-all duration-200 ${
+      className={`w-full p-2 sm:p-3 rounded-lg text-left transition-all duration-200 ${
         isSelected
           ? "bg-primary text-primary-foreground shadow-glow"
           : "bg-muted hover:bg-muted/80"
       }`}
       onClick={onClick}
     >
-      <p className={`font-medium text-sm ${isSelected ? "" : "text-foreground"}`}>
+      <p className={`font-medium text-xs sm:text-sm ${isSelected ? "" : "text-foreground"}`}>
         {building.name}
       </p>
       <p
-        className={`text-xs mt-1 line-clamp-1 ${
+        className={`text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1 ${
           isSelected ? "text-primary-foreground/80" : "text-muted-foreground"
         }`}
       >
         {building.description}
       </p>
       {building.openingHours && (
-        <div className={`flex items-center gap-1 mt-2 text-xs ${
+        <div className={`flex items-center gap-1 mt-1.5 sm:mt-2 text-[10px] sm:text-xs ${
           isSelected ? "text-primary-foreground/70" : "text-muted-foreground"
         }`}>
-          <Clock className="h-3 w-3" />
+          <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
           <span>{building.openingHours}</span>
         </div>
       )}
