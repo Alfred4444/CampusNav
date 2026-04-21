@@ -1,4 +1,4 @@
-import { X, Clock, MapPin, ArrowLeft } from "lucide-react";
+import { Clock, MapPin, ArrowLeft, Navigation, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Building } from "@/types/building";
@@ -7,6 +7,9 @@ import { getCategoryLabel, getCategoryColor } from "@/data/buildings";
 interface BuildingDetailProps {
   building: Building;
   onClose: () => void;
+  isNavigating?: boolean;
+  onStartNavigation?: (building: Building) => void;
+  onStopNavigation?: () => void;
 }
 
 const getCategoryBadgeClass = (category: Building["category"]) => {
@@ -20,7 +23,13 @@ const getCategoryBadgeClass = (category: Building["category"]) => {
   return classes[category];
 };
 
-const BuildingDetail = ({ building, onClose }: BuildingDetailProps) => {
+const BuildingDetail = ({
+  building,
+  onClose,
+  isNavigating = false,
+  onStartNavigation,
+  onStopNavigation,
+}: BuildingDetailProps) => {
   return (
     <div className="h-full flex flex-col bg-card animate-slide-in-left overflow-hidden">
       {/* Header */}
@@ -44,6 +53,30 @@ const BuildingDetail = ({ building, onClose }: BuildingDetailProps) => {
           </Badge>
         </div>
       </div>
+
+      {/* Navigate CTA */}
+      {(onStartNavigation || onStopNavigation) && (
+        <div className="px-2 sm:px-4 pt-2 sm:pt-3">
+          {isNavigating ? (
+            <Button
+              variant="destructive"
+              className="w-full"
+              onClick={onStopNavigation}
+            >
+              <Square className="h-4 w-4 mr-2" />
+              Stop Navigation
+            </Button>
+          ) : (
+            <Button
+              className="w-full"
+              onClick={() => onStartNavigation?.(building)}
+            >
+              <Navigation className="h-4 w-4 mr-2" />
+              Navigate Here
+            </Button>
+          )}
+        </div>
+      )}
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 sm:space-y-6">

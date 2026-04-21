@@ -9,6 +9,9 @@ interface CampusMapProps {
   zoom: number;
   selectedBuilding: Building | null;
   onSelectBuilding: (building: Building) => void;
+  userPosition?: [number, number] | null;
+  userHeading?: number | null;
+  navDestination?: Building | null;
 }
 
 // Create custom marker icon
@@ -45,10 +48,58 @@ const createMarkerIcon = (category: Building["category"], isSelected: boolean) =
   });
 };
 
-const CampusMap = ({ center, zoom, selectedBuilding, onSelectBuilding }: CampusMapProps) => {
+const createUserIcon = (heading: number | null) => {
+  const rotation = heading ?? 0;
+  return L.divIcon({
+    className: "user-position-icon",
+    html: `
+      <div style="position: relative; width: 28px; height: 28px;">
+        <div style="
+          position: absolute; inset: 0;
+          background-color: hsl(217 91% 55%);
+          border-radius: 50%;
+          opacity: 0.25;
+          animation: userPulse 2s ease-out infinite;
+        "></div>
+        <div style="
+          position: absolute; top: 4px; left: 4px;
+          width: 20px; height: 20px;
+          background-color: hsl(217 91% 50%);
+          border: 3px solid white;
+          border-radius: 50%;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        "></div>
+        ${heading !== null && !isNaN(rotation) ? `
+        <div style="
+          position: absolute; top: -4px; left: 50%;
+          width: 0; height: 0;
+          border-left: 6px solid transparent;
+          border-right: 6px solid transparent;
+          border-bottom: 10px solid hsl(217 91% 50%);
+          transform: translateX(-50%) rotate(${rotation}deg);
+          transform-origin: 50% 18px;
+        "></div>` : ''}
+      </div>
+    `,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+  });
+};
+
+const CampusMap = ({
+  center,
+  zoom,
+  selectedBuilding,
+  onSelectBuilding,
+  userPosition = null,
+  userHeading = null,
+  navDestination = null,
+}: CampusMapProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const markersRef = useRef<Map<string, L.Marker>>(new Map());
+  const userMarkerRef = useRef<L.Marker | null>(null);
+  const routeLineRef = useRef<L.Polyline | null>(null);
 
   // Initialize map
   useEffect(() => {
@@ -137,6 +188,55 @@ const CampusMap = ({ center, zoom, selectedBuilding, onSelectBuilding }: CampusM
       }
     });
   }, [selectedBuilding]);
+
+  // Update user position marker
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (userPosition) {
+      if (!userMarkerRef.current) {
+        userMarkerRef.current = L.marker(userPosition, {
+          icon: createUserIcon(userHeading),
+          zIndexOffset: 1000,
+          interactive: false,
+        }).addTo(map);
+      } else {
+        userMarkerRef.current.setLatLng(userPosition);
+        userMarkerRef.current.setIcon(createUserIcon(userHeading));
+      }
+    } else if (userMarkerRef.current) {
+      userMarkerRef.current.remove();
+      userMarkerRef.current = null;
+    }
+  }, [userPosition, userHeading]);
+
+  // Draw / update route line
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (userPosition && navDestination) {
+      const latlngs: L.LatLngExpression[] = [
+        userPosition,
+        [navDestination.latitude, navDestination.longitude],
+      ];
+      if (!routeLineRef.current) {
+        routeLineRef.current = L.polyline(latlngs, {
+          color: "hsl(217, 91%, 50%)",
+          weight: 5,
+          opacity: 0.85,
+          dashArray: "10, 10",
+          lineCap: "round",
+        }).addTo(map);
+      } else {
+        routeLineRef.current.setLatLngs(latlngs);
+      }
+    } else if (routeLineRef.current) {
+      routeLineRef.current.remove();
+      routeLineRef.current = null;
+    }
+  }, [userPosition, navDestination]);
 
   return <div ref={containerRef} className="w-full h-full z-0" />;
 };
