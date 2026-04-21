@@ -9,6 +9,9 @@ interface SidebarProps {
   onSelectBuilding: (building: Building) => void;
   onSelectCategory: (category: BuildingCategory | null) => void;
   onClearSelection: () => void;
+  isNavigating?: boolean;
+  onStartNavigation?: (building: Building) => void;
+  onStopNavigation?: () => void;
 }
 
 const Sidebar = ({
@@ -18,6 +21,9 @@ const Sidebar = ({
   onSelectBuilding,
   onSelectCategory,
   onClearSelection,
+  isNavigating,
+  onStartNavigation,
+  onStopNavigation,
 }: SidebarProps) => {
   return (
     <aside
@@ -31,7 +37,13 @@ const Sidebar = ({
     >
       <div className="h-full overflow-hidden">
         {selectedBuilding ? (
-          <BuildingDetail building={selectedBuilding} onClose={onClearSelection} />
+          <BuildingDetail
+            building={selectedBuilding}
+            onClose={onClearSelection}
+            isNavigating={isNavigating && onStartNavigation !== undefined}
+            onStartNavigation={onStartNavigation}
+            onStopNavigation={onStopNavigation}
+          />
         ) : (
           <BuildingList
             selectedCategory={selectedCategory}
