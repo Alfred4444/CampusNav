@@ -11,20 +11,15 @@ interface BuildingListProps {
   onSelectCategory: (category: BuildingCategory | null) => void;
 }
 
-const categories: BuildingCategory[] = ["faculty", "department", "hostel", "admin", "facility"];
+const categories: BuildingCategory[] = ["academic", "residential", "food", "health", "recreation", "administrative", "sports"];
 
-const getCategoryBadgeClass = (category: BuildingCategory, isActive: boolean) => {
+const getCategoryBadgeClass = (_category: BuildingCategory, isActive: boolean) => {
   if (!isActive) return "bg-muted text-muted-foreground hover:bg-muted/80 cursor-pointer";
-  
-  const classes: Record<BuildingCategory, string> = {
-    faculty: "bg-primary text-primary-foreground cursor-pointer",
-    department: "bg-secondary text-secondary-foreground cursor-pointer",
-    hostel: "bg-category-hostel text-primary-foreground cursor-pointer",
-    admin: "bg-category-admin text-primary-foreground cursor-pointer",
-    facility: "bg-category-facility text-primary-foreground cursor-pointer",
-  };
-  return classes[category];
+  return "text-white cursor-pointer";
 };
+
+const getCategoryBadgeStyle = (category: BuildingCategory, isActive: boolean): React.CSSProperties =>
+  isActive ? { backgroundColor: getCategoryColor(category), color: "white" } : {};
 
 const BuildingList = ({
   selectedCategory,
@@ -61,6 +56,7 @@ const BuildingList = ({
             <Badge
               key={category}
               className={`transition-all text-[10px] sm:text-xs px-1.5 sm:px-2.5 py-0.5 ${getCategoryBadgeClass(category, selectedCategory === category)}`}
+              style={getCategoryBadgeStyle(category, selectedCategory === category)}
               onClick={() => onSelectCategory(selectedCategory === category ? null : category)}
             >
               {getCategoryLabel(category)}

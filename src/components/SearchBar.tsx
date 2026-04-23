@@ -63,18 +63,13 @@ const SearchBar = ({ onSelectBuilding }: SearchBarProps) => {
     setSelectedCategory(prev => prev === category ? undefined : category);
   };
 
-  const getCategoryBadgeClass = (category: BuildingCategory, isActive: boolean) => {
+  const getCategoryBadgeClass = (_category: BuildingCategory, isActive: boolean) => {
     if (!isActive) return "bg-muted text-muted-foreground hover:bg-muted/80";
-    
-    const classes: Record<BuildingCategory, string> = {
-      faculty: "bg-primary text-primary-foreground",
-      department: "bg-secondary text-secondary-foreground",
-      hostel: "bg-category-hostel text-primary-foreground",
-      admin: "bg-category-admin text-primary-foreground",
-      facility: "bg-category-facility text-primary-foreground",
-    };
-    return classes[category];
+    return "text-white";
   };
+
+  const getCategoryBadgeStyle = (category: BuildingCategory, isActive: boolean): React.CSSProperties =>
+    isActive ? { backgroundColor: getCategoryColor(category), color: "white" } : {};
 
   return (
     <div ref={containerRef} className="relative w-full max-w-md min-w-0">
@@ -121,6 +116,7 @@ const SearchBar = ({ onSelectBuilding }: SearchBarProps) => {
               <Badge
                 key={category}
                 className={`cursor-pointer transition-all text-[10px] sm:text-xs px-1.5 sm:px-2.5 py-0.5 ${getCategoryBadgeClass(category, selectedCategory === category)}`}
+                style={getCategoryBadgeStyle(category, selectedCategory === category)}
                 onClick={() => toggleCategory(category)}
               >
                 {getCategoryLabel(category)}
@@ -148,7 +144,10 @@ const SearchBar = ({ onSelectBuilding }: SearchBarProps) => {
                 <p className="font-medium text-foreground truncate text-xs sm:text-sm">{building.name}</p>
                 <p className="text-[10px] sm:text-sm text-muted-foreground truncate">{building.description}</p>
               </div>
-              <Badge className={`shrink-0 text-[9px] sm:text-xs hidden xs:inline-flex ${getCategoryBadgeClass(building.category, true)}`}>
+              <Badge
+                className="shrink-0 text-[9px] sm:text-xs hidden xs:inline-flex text-white"
+                style={{ backgroundColor: getCategoryColor(building.category) }}
+              >
                 {getCategoryLabel(building.category)}
               </Badge>
             </button>

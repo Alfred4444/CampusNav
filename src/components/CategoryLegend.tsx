@@ -7,7 +7,7 @@ interface CategoryLegendProps {
   onSelectCategory: (category: BuildingCategory | null) => void;
 }
 
-const categories: BuildingCategory[] = ["faculty", "department", "hostel", "admin", "facility"];
+const categories: BuildingCategory[] = ["academic", "residential", "food", "health", "recreation", "administrative", "sports"];
 
 const CategoryLegend = ({ selectedCategory, onSelectCategory }: CategoryLegendProps) => {
   return (
