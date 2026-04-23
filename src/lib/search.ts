@@ -27,5 +27,5 @@ export const getBuildingsByCategory = (category: BuildingCategory): Building[] =
 };
 
 export const getAllCategories = (): BuildingCategory[] => {
-  return ["faculty", "department", "hostel", "admin", "facility"];
+  return ["academic", "residential", "food", "health", "recreation", "administrative", "sports"];
 };

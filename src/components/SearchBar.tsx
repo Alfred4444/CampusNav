@@ -63,18 +63,13 @@ const SearchBar = ({ onSelectBuilding }: SearchBarProps) => {
     setSelectedCategory(prev => prev === category ? undefined : category);
   };
 
-  const getCategoryBadgeClass = (category: BuildingCategory, isActive: boolean) => {
+  const getCategoryBadgeClass = (_category: BuildingCategory, isActive: boolean) => {
     if (!isActive) return "bg-muted text-muted-foreground hover:bg-muted/80";
-    
-    const classes: Record<BuildingCategory, string> = {
-      faculty: "bg-primary text-primary-foreground",
-      department: "bg-secondary text-secondary-foreground",
-      hostel: "bg-category-hostel text-primary-foreground",
-      admin: "bg-category-admin text-primary-foreground",
-      facility: "bg-category-facility text-primary-foreground",
-    };
-    return classes[category];
+    return "text-white";
   };
+
+  const getCategoryBadgeStyle = (category: BuildingCategory, isActive: boolean): React.CSSProperties =>
+    isActive ? { backgroundColor: getCategoryColor(category), color: "white" } : {};
 
   return (
     <div ref={containerRef} className="relative w-full max-w-md min-w-0">

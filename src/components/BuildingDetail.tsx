@@ -42,7 +42,7 @@ const BuildingDetail = ({
           <h2 className="font-display font-bold text-base sm:text-xl text-foreground leading-tight">
             {building.name}
           </h2>
-          <Badge className={`text-[10px] sm:text-xs shrink-0 ${getCategoryBadgeClass(building.category)}`}>
+          <Badge className="text-[10px] sm:text-xs shrink-0" style={getCategoryBadgeStyle(building.category)}>
             {getCategoryLabel(building.category)}
           </Badge>
         </div>
