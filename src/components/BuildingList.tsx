@@ -56,6 +56,7 @@ const BuildingList = ({
             <Badge
               key={category}
               className={`transition-all text-[10px] sm:text-xs px-1.5 sm:px-2.5 py-0.5 ${getCategoryBadgeClass(category, selectedCategory === category)}`}
+              style={getCategoryBadgeStyle(category, selectedCategory === category)}
               onClick={() => onSelectCategory(selectedCategory === category ? null : category)}
             >
               {getCategoryLabel(category)}
