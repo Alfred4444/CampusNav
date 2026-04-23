@@ -116,6 +116,7 @@ const SearchBar = ({ onSelectBuilding }: SearchBarProps) => {
               <Badge
                 key={category}
                 className={`cursor-pointer transition-all text-[10px] sm:text-xs px-1.5 sm:px-2.5 py-0.5 ${getCategoryBadgeClass(category, selectedCategory === category)}`}
+                style={getCategoryBadgeStyle(category, selectedCategory === category)}
                 onClick={() => toggleCategory(category)}
               >
                 {getCategoryLabel(category)}
@@ -143,7 +144,10 @@ const SearchBar = ({ onSelectBuilding }: SearchBarProps) => {
                 <p className="font-medium text-foreground truncate text-xs sm:text-sm">{building.name}</p>
                 <p className="text-[10px] sm:text-sm text-muted-foreground truncate">{building.description}</p>
               </div>
-              <Badge className={`shrink-0 text-[9px] sm:text-xs hidden xs:inline-flex ${getCategoryBadgeClass(building.category, true)}`}>
+              <Badge
+                className="shrink-0 text-[9px] sm:text-xs hidden xs:inline-flex text-white"
+                style={{ backgroundColor: getCategoryColor(building.category) }}
+              >
                 {getCategoryLabel(building.category)}
               </Badge>
             </button>
