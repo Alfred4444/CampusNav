@@ -1,7 +1,14 @@
 export interface Building {
   id: string;
   name: string;
-  category: "faculty" | "department" | "hostel" | "admin" | "facility";
+  category:
+    | "academic"
+    | "residential"
+    | "food"
+    | "health"
+    | "recreation"
+    | "administrative"
+    | "sports";
   latitude: number;
   longitude: number;
   description: string;
