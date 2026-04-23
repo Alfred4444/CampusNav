@@ -12,16 +12,10 @@ interface BuildingDetailProps {
   onStopNavigation?: () => void;
 }
 
-const getCategoryBadgeClass = (category: Building["category"]) => {
-  const classes: Record<Building["category"], string> = {
-    faculty: "bg-primary text-primary-foreground",
-    department: "bg-secondary text-secondary-foreground",
-    hostel: "bg-category-hostel text-primary-foreground",
-    admin: "bg-category-admin text-primary-foreground",
-    facility: "bg-category-facility text-primary-foreground",
-  };
-  return classes[category];
-};
+const getCategoryBadgeStyle = (category: Building["category"]) => ({
+  backgroundColor: getCategoryColor(category),
+  color: "white",
+});
 
 const BuildingDetail = ({
   building,
